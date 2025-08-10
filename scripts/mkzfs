@@ -1,0 +1,12 @@
+#!/bin/bash
+
+nvmedisks=`lsblk | grep nvme | awk '{print $1,$4}' | grep T | sed -e 's/[0-9]*T//' -e 's:nvme:/dev/nvme:' | sort`
+echo $nvmedisks
+
+zpool create -f -m /scratch scratch -o ashift=12 -o autotrim=on $nvmedisks
+zfs set recordsize=16K scratch
+zfs set checksum=fletcher4 scratch
+zfs set atime=off scratch
+zfs set dedup=off scratch
+zfs set compression=lz4 scratch
+

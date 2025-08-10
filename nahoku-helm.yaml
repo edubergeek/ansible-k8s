@@ -1,0 +1,41 @@
+- name: Install Helm
+  hosts: k8s_admin
+  become: yes
+  vars_files:
+    - group_vars/nahoku
+  tasks:
+    - name: Include only files matching bastion.yaml (2.2)
+      include_vars:
+        dir: group_vars
+        files_matching: nahoku.yaml
+    - name: Install curl (if not already installed)
+      package:
+        name: curl
+        state: present
+
+    - name: Download Helm installation script
+      get_url:
+        url: https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+        dest: /tmp/get_helm.sh
+        mode: '0755'
+
+    - name: Run Helm installation script
+      command: "/tmp/get_helm.sh --version v{{ helm_version }}"
+      args:
+        creates: /usr/local/bin/helm
+      register: helm_install_result
+      changed_when: false
+
+    - name: Add /usr/local/bin to PATH
+      lineinfile:
+        path: ~/.bashrc
+        line: 'export PATH=$PATH:/usr/local/bin'
+      when: helm_install_result.rc == 0
+
+    - name: Add the public stable helm repo
+      command: "helm repo add stable https://charts.helm.sh/stable"
+      args:
+        creates: "{{ lookup('env', 'HELM_REPOSITORY_CONFIG') }}"
+      register: helm_repo_result
+      changed_when: false
+

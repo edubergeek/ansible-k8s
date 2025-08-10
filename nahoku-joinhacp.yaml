@@ -1,0 +1,6 @@
+- name: Kubernetes HA Control Plane Update Certs
+  hosts: k8s_ha_masters
+  become: yes
+  tasks:
+    - name: "Join the remaining control plane nodes"
+      shell: "kubeadm join {{ kubevip_ip }}:6443 --token {{ join_token }} --discovery-token-ca-cert-hash {{ join_hash }} --control-plane --certificate-key {{ join_key }}"

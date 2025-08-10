@@ -1,0 +1,14 @@
+- name: Kubernetes HA Control Plane Initialize
+  hosts: k8s_initial_master
+  become: yes
+  tasks:
+    - name: 'Create $HOME/.kube directory'
+      file:
+        path: "/home/{{ ansible_user }}/.kube"
+        state: directory
+        mode: '0700'
+    - name: "Fetch kube.conf"
+      fetch:
+        src: /etc/kubernetes/admin.conf
+        dest: "/home/{{ ansible_user }}/.kube/kube.conf"
+        flat: true

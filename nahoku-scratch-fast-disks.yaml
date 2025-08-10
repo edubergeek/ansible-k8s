@@ -1,0 +1,57 @@
+- name: NVMe Scratch Storage Volumes
+  hosts: l40s
+  become: yes
+  tasks:
+    - name: Show device information
+      parted: 
+        device: "{{ item.device }}"
+        unit: GiB
+        state: info
+      with_items: "{{ hostvars[inventory_hostname].sv_devices }}"
+      register: disk_parted
+
+    - name: Print device information
+      debug:
+        msg: System {{ inventory_hostname }} device {{ item.disk.dev }} size {{ item.disk.size }} partitions {{ item.partitions|length }}
+      with_items: "{{ disk_parted['results'] }}"
+
+    - name: Install zfs
+      apt:
+        name:
+          - zfsutils-linux 
+          - zfs-dkms
+        state: present
+
+    - name: Copy scratch disk script
+      copy:
+        src: ./scripts/mkzfs
+        dest: /tmp/mkzfs
+        mode: 'u=rwx,g=rwx'
+        force: yes
+
+    - name: Run the mkzfs scratch disk script
+      shell: /tmp/mkzfs
+
+    - name: Verify there is a RAID0 zfs pool mounted as /scratch
+      zfs:
+        name: scratch
+        state: present
+
+# community.general.zpool is still in development and not in the latest branch
+#      community.general.zpool:
+#        name: scratch
+#        mountpoint: /scratch
+#        pool_properties:
+#          ashift: 12
+#          autotrim: on
+#        filesystem_properties:
+#          compression: lz4
+#          dedup: off
+#          checksum: fletcher4
+#          atime: off
+#        vdevs:
+#          - type: stripe
+#            disks:
+#              - "{{ item.device }}"
+#            with_items: "{{ hostvars[inventory_hostname].sv_devices }}"
+

@@ -1,0 +1,6 @@
+- name: Kubernetes Join Worker Node
+  hosts: k8s_workers
+  become: yes
+  tasks:
+    - name: "Join worker nodes"
+      shell: "{{ lookup('ansible.builtin.file', 'group_vars/join') }}"

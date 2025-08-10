@@ -1,0 +1,7 @@
+roles: kube,app,discovery
+authToken: d398795148ba7f73cdb6075f33559ea5
+proxyAddr: tp.ifa.hawaii.edu:443
+kubeClusterName: nahoku
+labels:
+    teleport.internal/resource-id: e6006eb2-a6f7-4d0d-b87c-078296829474
+

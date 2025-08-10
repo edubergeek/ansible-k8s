@@ -1,0 +1,10 @@
+- name: Kubernetes Cloud Controller Configuration
+  hosts: k8s_initial_master
+  become: yes
+  vars_files:
+    - group_vars/nahoku
+  tasks:
+    - name: Create the cloud controller configmap
+      shell:
+        cmd: "kubectl create configmap -n kube-system kubevip --from-literal cidr-global={{ kubevip_cidr_global }}  --kubeconfig=/etc/kubernetes/admin.conf"
+

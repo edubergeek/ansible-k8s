@@ -1,0 +1,15 @@
+ansible_port: 22
+ansible_user: "{{ lookup('env', 'ANSIBLE_USER') }}"
+ansible_become: true
+ansible_become_method: sudo
+ansible_python_interpreter: /usr/bin/python3
+mlx_driver: true
+cluster: nahoku
+kubernetes_version: "1.32"
+beegfs_version: "7.4.5"
+runtime: containerd
+kubevip_version: "0.8.9"
+kubevip_ip: "{{ lookup('env', 'KUBEVIP_IP') }}"
+kubevip_cidr_global: "{{ lookup('env', 'KUBEVIP_CIDR_GLOBAL') }}"
+calico_version: "3.29.1"
+helm_version: "3.17.0"

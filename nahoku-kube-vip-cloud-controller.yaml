@@ -1,0 +1,33 @@
+- name: Kubernetes Cloud Controller Installation
+  hosts: k8s_initial_master
+  become: yes
+  vars_files:
+    - group_vars/nahoku
+  tasks:
+    - name: Include only files matching bastion.yaml (2.2)
+      include_vars:
+        dir: group_vars
+        files_matching: nahoku.yaml
+    - name: Install curl (if not already installed)
+      package:
+        name: curl
+        state: present
+
+    - name: Download Helm installation script
+      get_url:
+        url: https://raw.githubusercontent.com/kube-vip/kube-vip-cloud-provider/main/manifest/kube-vip-cloud-controller.yaml
+        dest: /tmp/kube-vip-cloud-controller.yaml
+        mode: '0644'
+
+    - name: Install kube-vip cloud controller
+      shell:
+        cmd: kubectl apply -f /tmp/kube-vip-cloud-controller.yaml --kubeconfig=/etc/kubernetes/admin.conf
+        args:
+          creates: /etc/kubernetes/manifests/kube-vip-cloud-controller.yaml
+
+    - name: "Fetch the kube-vip cloud controller manifest"
+      fetch:
+        src: /etc/kubernetes/manifests/kube-vip.yaml
+        dest: ./manifests/kube-vip-cloud-controller.yaml
+        flat: true
+

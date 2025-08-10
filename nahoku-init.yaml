@@ -1,0 +1,10 @@
+- name: Kubernetes HA Control Plane Initialize
+  hosts: k8s_initial_master
+  become: yes
+  tasks:
+    - name: "Initialize the control plane"
+      shell: "kubeadm init --pod-network-cidr={{ kube_podnet }} --control-plane-endpoint={{ kubevip_ip }} --upload-certs"
+      register: kube_join
+    - name: "Debug show join message"
+      debug:
+        var: kube_join.stdout

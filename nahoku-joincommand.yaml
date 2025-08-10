@@ -1,0 +1,22 @@
+- name: Kubernetes Get Join Command
+  hosts: k8s-cp1
+  become: yes
+  tasks:
+    - name: "Generate the join command"
+      shell: "kubeadm token create --print-join-command"
+      register: kube_join
+    - name: "Save join command"
+      set_fact:
+        kube_join_cmd: "{{ kube_join.stdout }}"
+
+- name: Kubernetes Join Worker Node
+  hosts: k8s-cp1
+  become: yes
+  tasks:
+    -  name: write to file
+       copy:
+         content: "{{ kube_join.stdout }}"
+         dest: "group_vars/join"
+       delegate_to: localhost
+       run_once: true
+

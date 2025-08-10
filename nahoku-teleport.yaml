@@ -1,0 +1,13 @@
+- name: Install Helm
+  hosts: k8s_admin
+  become: yes
+  vars_files:
+    - group_vars/nahoku
+  tasks:
+    - name: Add helm repo for teleport
+      command: "helm repo add teleport https://charts.releases.teleport.dev && helm repo update"
+#      args:
+#        creates: /usr/local/bin/helm
+#      register: helm_install_result
+#      changed_when: false
+

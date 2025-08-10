@@ -1,0 +1,31 @@
+- name: Longhorn Node Requirements
+  hosts: nahoku
+  become: yes
+  tasks:
+    - name: Install miscellaneous apps
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - bash
+        - curl
+        - util-linux
+        - open-iscsi
+        - nfs-common
+
+    - name: Load the iscsi_tcp kernel module
+      shell: |
+        modprobe iscsi_tcp
+
+    - name: Disable and stop service multipathd
+      ansible.builtin.service:
+        name: multipathd
+        enabled: false
+        state: stopped
+
+    - name: Enable and start service iscsid
+      ansible.builtin.service:
+        name: iscsid
+        enabled: true
+        state: started
+

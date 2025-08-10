@@ -1,0 +1,16 @@
+- name: Kubernetes HA Control Plane Update Certs
+  hosts: k8s_initial_master
+  become: yes
+  tasks:
+    - name: "Update the control plane certs"
+      shell: "kubeadm init phase upload-certs --upload-certs"
+      register: kube_key
+    - name: "Show key"
+      debug:
+        var: kube_key.stdout
+    - name: "Generate the join command"
+      shell: "kubeadm token create --print-join-command"
+      register: kube_join
+    - name: "Show join command"
+      debug:
+        var: kube_join.stdout
